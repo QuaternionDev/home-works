@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Házi · Feladatok</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+
+    /* ─── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:        #0e0e0e;
+      --bg2:       #161616;
+      --bg3:       #1f1f1f;
+      --border:    rgba(255,255,255,0.08);
+      --border2:   rgba(255,255,255,0.14);
+      --text:      #f0ece3;
+      --muted:     #7a7570;
+      --accent:    #c8b89a;
+      --accent2:   #e8dcc8;
+      --green:     #4caf7d;
+      --green-bg:  rgba(76,175,125,0.12);
+      --amber:     #d4935a;
+      --amber-bg:  rgba(212,147,90,0.12);
+      --red:       #c06060;
+      --red-bg:    rgba(192,96,96,0.12);
+      --blue:      #6b9fd4;
+      --blue-bg:   rgba(107,159,212,0.12);
+      --radius:    12px;
+      --radius-sm: 7px;
+      --serif:     'DM Serif Display', serif;
+      --sans:      'DM Sans', sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100%;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .app { max-width: 520px; margin: 0 auto; padding: 0 1.25rem 5rem; }
+
+    /* ─── SCREENS ────────────────────────────────────────── */
+    .screen { display: none; animation: fadein 0.3s ease; }
+    .screen.active { display: block; }
+    @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── TOPBAR ─────────────────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 0 2rem;
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .brand { font-family: var(--serif); font-size: 1.1rem; color: var(--accent); letter-spacing: 0.01em; }
+    .brand span { color: var(--muted); font-style: italic; }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+    .user-badge {
+      font-size: 12px; color: var(--muted); background: var(--bg3);
+      border: 0.5px solid var(--border); padding: 5px 10px;
+      border-radius: 20px; cursor: pointer; transition: border-color 0.15s;
+    }
+    .user-badge:hover { border-color: var(--border2); color: var(--text); }
+
+    /* ─── LOGIN ──────────────────────────────────────────── */
+    .login-wrap {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; padding: 2rem 1.25rem;
+      max-width: 520px; margin: 0 auto;
+    }
+    .login-eyebrow {
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.75rem;
+    }
+    .login-title {
+      font-family: var(--serif); font-size: clamp(2rem, 6vw, 2.8rem);
+      line-height: 1.1; margin-bottom: 0.4rem; color: var(--text);
+    }
+    .login-title em { color: var(--accent); font-style: italic; }
+    .login-sub { font-size: 14px; color: var(--muted); margin-bottom: 2.5rem; line-height: 1.6; }
+
+    .field { margin-bottom: 1rem; }
+    .field label { display: block; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+    .field input, .field select, .field textarea {
+      width: 100%; background: var(--bg2); border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 11px 14px;
+      font-family: var(--sans); font-size: 14px; color: var(--text);
+      outline: none; transition: border-color 0.15s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+    .field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .field select { appearance: none; cursor: pointer; }
+    .field select option { background: var(--bg2); }
+
+    .btn-primary {
+      width: 100%; margin-top: 0.5rem; background: var(--accent); color: #0e0e0e;
+      border: none; border-radius: var(--radius-sm); padding: 12px;
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background 0.15s, opacity 0.15s;
+    }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .login-err { font-size: 13px; color: var(--red); margin-top: 10px; min-height: 18px; }
+
+    .preview-btn {
+      width: 100%; margin-top: 12px; background: none; border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 11px; font-family: var(--sans);
+      font-size: 13px; color: var(--muted); cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .preview-btn:hover { border-color: var(--border2); color: var(--text); }
+
+    /* ─── PREVIEW BANNER ─────────────────────────────────── */
+    .preview-banner {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: var(--amber-bg);
+      border-bottom: 0.5px solid rgba(212,147,90,0.3);
+      padding: 8px 16px; font-size: 12px; color: var(--amber);
+      text-align: center; z-index: 90; letter-spacing: 0.03em;
+    }
+    .preview-banner span { opacity: 0.6; margin: 0 6px; }
+    .exit-preview-btn {
+      background: none; border: 0.5px solid rgba(212,147,90,0.5);
+      border-radius: 20px; padding: 2px 10px; font-family: var(--sans);
+      font-size: 11px; color: var(--amber); cursor: pointer; margin-left: 10px;
+      transition: background 0.15s;
+    }
+    .exit-preview-btn:hover { background: rgba(212,147,90,0.1); }
+
+    /* ─── BOTTOM NAV ─────────────────────────────────────── */
+    .bottom-nav {
+      display: none; position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--bg2); border-top: 0.5px solid var(--border);
+      padding: 10px 0 max(env(safe-area-inset-bottom), 10px);
+      z-index: 80; justify-content: center; gap: 0;
+    }
+    .bottom-nav.visible { display: flex; }
+    .nav-btn {
+      flex: 1; max-width: 120px; display: flex; flex-direction: column;
+      align-items: center; gap: 3px; background: none; border: none;
+      color: var(--muted); font-family: var(--sans); font-size: 11px;
+      cursor: pointer; padding: 4px 0; transition: color 0.15s;
+    }
+    .nav-btn.active { color: var(--accent); }
+    .nav-icon { font-size: 20px; }
+
+    /* ─── LIST HEADER ────────────────────────────────────── */
+    .list-header { margin-bottom: 1.5rem; }
+    .list-title { font-family: var(--serif); font-size: 1.8rem; margin-bottom: 4px; }
+    .list-sub { font-size: 13px; color: var(--muted); }
+
+    /* ─── TICKET CARDS ───────────────────────────────────── */
+    .ticket-card {
+      background: var(--bg2); border: 0.5px solid var(--border);
+      border-radius: var(--radius); padding: 1.1rem 1.25rem; margin-bottom: 10px;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .ticket-card:hover { border-color: var(--border2); background: var(--bg3); }
+    .ticket-card.mine { border-color: rgba(107,159,212,0.35); }
+    .tc-left { flex: 1; min-width: 0; }
+    .tc-subject { font-size: 15px; font-weight: 500; }
+    .tc-meta { font-size: 13px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tc-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    /* ─── PILLS ──────────────────────────────────────────── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
+      padding: 4px 9px; border-radius: 20px; white-space: nowrap;
+    }
+    .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .pill.pending  { background: var(--amber-bg); color: var(--amber); }
+    .pill.approved { background: var(--green-bg); color: var(--green); }
+    .pill.rejected { background: var(--red-bg);   color: var(--red); }
+
+    /* ─── EMPTY ──────────────────────────────────────────── */
+    .empty-state { text-align: center; padding: 3rem 0; color: var(--muted); font-size: 14px; }
+
+    /* ─── TIMETABLE ──────────────────────────────────────── */
+    .day-group { margin-bottom: 2rem; }
+    .day-label {
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .day-label::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+    .hw-card {
+      background: var(--bg2); border: 0.5px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 14px;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    }
+    .hw-card:hover { border-color: var(--border2); background: var(--bg3); }
+    .hw-subj-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .hw-info { flex: 1; min-width: 0; }
+    .hw-subject { font-size: 14px; font-weight: 500; }
+    .hw-desc { font-size: 13px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hw-by { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ─── LOADING ─────────────────────────────────────────── */
+    .loading-overlay {
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; transition: opacity 0.3s;
+    }
+    .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 28px; height: 28px; border: 1.5px solid var(--border2);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── TOAST ───────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 5rem; left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--bg3); border: 0.5px solid var(--border2);
+      border-radius: 20px; padding: 9px 18px; font-size: 13px;
+      color: var(--text); opacity: 0; transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none; white-space: nowrap; z-index: 200;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ─── MODAL ───────────────────────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 150;
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg2); border: 0.5px solid var(--border2);
+      border-radius: var(--radius); padding: 1.75rem;
+      width: 100%; max-width: 400px; animation: fadein 0.2s ease;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-wide { max-width: 480px; }
+    .modal-title { font-family: var(--serif); font-size: 1.35rem; margin-bottom: 4px; }
+    .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; }
+    .modal-err { font-size: 13px; color: var(--red); margin-top: 10px; min-height: 18px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 1.25rem; }
+
+    .btn-ghost {
+      flex: 1; background: none; border: 0.5px solid var(--border2);
+      border-radius: var(--radius-sm); padding: 10px;
+      font-family: var(--sans); font-size: 14px; color: var(--muted);
+      cursor: pointer; transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+    .btn-accent {
+      flex: 1; background: var(--accent); border: none;
+      border-radius: var(--radius-sm); padding: 10px;
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      color: #0e0e0e; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-accent:hover { background: var(--accent2); }
+    .btn-accent:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-danger {
+      flex: 1; background: var(--red-bg); border: 0.5px solid rgba(192,96,96,0.4);
+      border-radius: var(--radius-sm); padding: 10px;
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      color: var(--red); cursor: pointer; transition: background 0.15s;
+    }
+    .btn-danger:hover { background: rgba(192,96,96,0.2); }
+    .btn-green {
+      flex: 1; background: var(--green-bg); border: 0.5px solid rgba(76,175,125,0.4);
+      border-radius: var(--radius-sm); padding: 10px;
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      color: var(--green); cursor: pointer; transition: background 0.15s;
+    }
+    .btn-green:hover { background: rgba(76,175,125,0.2); }
+
+    .confirm-modal { text-align: center; }
+    .confirm-icon { font-size: 2rem; margin-bottom: 10px; }
+    .confirm-title { font-family: var(--serif); font-size: 1.3rem; margin-bottom: 6px; }
+    .confirm-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.5; }
+
+    /* ─── FORM ROW ────────────────────────────────────────── */
+    .form-row { display: flex; gap: 10px; }
+    .form-row .field { flex: 1; }
+
+    /* ─── ADMIN ───────────────────────────────────────────── */
+    .admin-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: 0.5px solid var(--border); border-radius: 20px;
+      padding: 5px 12px; font-family: var(--sans); font-size: 12px;
+      color: var(--accent); cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    }
+    .admin-btn:hover { border-color: var(--accent); background: rgba(200,184,154,0.07); }
+
+    .admin-section-label {
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 12px; margin-top: 2rem;
+    }
+    .admin-section-label:first-of-type { margin-top: 0; }
+
+    .admin-ticket-card {
+      background: var(--bg2); border: 0.5px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 10px;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    }
+    .atc-left { flex: 1; min-width: 0; }
+    .atc-subject { font-size: 14px; font-weight: 500; }
+    .atc-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .atc-desc { font-size: 13px; color: var(--text); margin-top: 6px; line-height: 1.5; opacity: 0.8; }
+    .atc-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .atc-actions { display: flex; gap: 6px; }
+
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: 6px; background: none;
+      border: 0.5px solid var(--border); color: var(--muted); font-size: 14px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .icon-btn:hover { border-color: var(--border2); color: var(--text); background: var(--bg3); }
+    .icon-btn.approve:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+    .icon-btn.reject-btn:hover { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
+    .icon-btn.danger:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
+    .new-ticket-btn {
+      width: 100%; background: none; border: 0.5px dashed var(--border2);
+      border-radius: var(--radius); padding: 14px; font-family: var(--sans);
+      font-size: 14px; color: var(--muted); cursor: pointer;
+      transition: border-color 0.15s, color 0.15s; margin-top: 4px;
+    }
+    .new-ticket-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ─── DETAIL ──────────────────────────────────────────── */
+    .detail-pill-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .detail-desc {
+      font-size: 14px; color: var(--text); line-height: 1.7;
+      background: var(--bg3); border: 0.5px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem;
+    }
+    .detail-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+
+    /* ─── ACCOUNT ─────────────────────────────────────────── */
+    .lang-selector { display: flex; gap: 6px; margin-top: 10px; }
+    .lang-btn {
+      flex: 1; background: var(--bg2); border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 9px 4px;
+      font-family: var(--sans); font-size: 12px; color: var(--muted);
+      cursor: pointer; transition: border-color 0.15s, color 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .lang-btn:hover { border-color: var(--border2); color: var(--text); }
+    .lang-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,184,154,0.07); }
+    .info-card {
+      background: var(--bg2); border: 0.5px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem;
+    }
+    .info-card-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .info-val { font-size: 15px; font-weight: 500; }
+    .info-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* ─── FAB ─────────────────────────────────────────────── */
+    .fab {
+      position: fixed; bottom: 4.5rem; right: 1.25rem;
+      width: 48px; height: 48px; background: var(--accent); border: none;
+      border-radius: 50%; color: #0e0e0e; font-size: 24px;
+      cursor: pointer; display: none; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      transition: background 0.15s, transform 0.15s; z-index: 70;
+      line-height: 1;
+    }
+    .fab:hover { background: var(--accent2); transform: scale(1.06); }
+    .fab.visible { display: flex; }
+
+    /* ─── DIVIDER ─────────────────────────────────────────── */
+    .divider { border: none; border-top: 0.5px solid var(--border); margin: 1.5rem 0; }
+
+    /* ─── FILTER BAR ──────────────────────────────────────── */
+    .filter-bar { display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .filter-chip {
+      background: var(--bg2); border: 0.5px solid var(--border);
+      border-radius: 20px; padding: 5px 12px; font-family: var(--sans);
+      font-size: 12px; color: var(--muted); cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .filter-chip:hover { border-color: var(--border2); color: var(--text); }
+    .filter-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(200,184,154,0.07); }
+  </style>
+</head>
+<body>
+
+  <!-- PREVIEW BANNER -->
+  <div class="preview-banner" id="preview-banner" style="display:none;"></div>
+
+  <!-- LOADING -->
+  <div class="loading-overlay" id="loading"><div class="spinner"></div></div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- FAB: Upload new ticket -->
+  <button class="fab" id="fab" onclick="openUploadModal()">＋</button>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- LOGIN SCREEN                                           -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="screen active" id="screen-login">
+    <div class="login-wrap">
+      <div class="login-eyebrow" id="lbl-eyebrow">Széchenyi SZC · 9/G</div>
+      <h1 class="login-title" id="login-title-el">Házi<br><em>Feladatok.</em></h1>
+      <p class="login-sub" id="lbl-sub">Jelentkezz be az osztályfiókkal, hogy feltöltsd és megnézd a házifeladatokat.</p>
+      <div class="field">
+        <label id="lbl-username">Felhasználónév</label>
+        <input type="text" id="login-username" placeholder="kovacs.balazs" autocomplete="username" onkeydown="if(event.key==='Enter')login()" />
+      </div>
+      <div class="field">
+        <label id="lbl-password">Jelszó</label>
+        <input type="password" id="login-pw" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()" />
+      </div>
+      <button class="btn-primary" id="login-btn" onclick="login()">Bejelentkezés</button>
+      <div class="login-err" id="login-err"></div>
+      <button class="preview-btn" id="preview-btn-txt" onclick="enterPreview()">Előnézet fiók nélkül →</button>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:2rem;">
+        All rights reserved. · Made by <a href="https://github.com/QuaternionDev" style="color:var(--accent);text-decoration:none;">QuaternionDev</a> · 2026<br>v1.0.0
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- TICKETS SCREEN (My submitted homework)                 -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-tickets">
+    <div class="app">
+      <div class="topbar">
+        <div class="brand">Házi <span>Feladatok</span></div>
+        <div class="topbar-right">
+          <button class="admin-btn" id="admin-panel-btn" onclick="navTo('admin')" style="display:none;">⚙ Admin</button>
+          <div class="user-badge" id="user-badge" onclick="navTo('account')">⋯</div>
+        </div>
+      </div>
+      <div class="list-header">
+        <div class="list-title" id="tickets-title">Feladataim</div>
+        <div class="list-sub" id="tickets-sub">A te feltöltött házifeladataid</div>
+      </div>
+      <div class="filter-bar" id="tickets-filter-bar">
+        <button class="filter-chip active" data-filter="all" onclick="setFilter('all')">Mind</button>
+        <button class="filter-chip" data-filter="pending" onclick="setFilter('pending')">Várakozó</button>
+        <button class="filter-chip" data-filter="approved" onclick="setFilter('approved')">Jóváhagyott</button>
+        <button class="filter-chip" data-filter="rejected" onclick="setFilter('rejected')">Elutasított</button>
+      </div>
+      <div id="tickets-list"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- TIMETABLE SCREEN                                       -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-timetable">
+    <div class="app">
+      <div class="topbar">
+        <div class="brand">Házi <span>Feladatok</span></div>
+        <div class="user-badge" id="tt-user-badge" onclick="navTo('account')">⋯</div>
+      </div>
+      <div class="list-header">
+        <div class="list-title" id="tt-title">Órarend</div>
+        <div class="list-sub" id="tt-sub">Jóváhagyott feladatok dátum szerint</div>
+      </div>
+      <div id="timetable-content"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ACCOUNT SCREEN                                         -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-account">
+    <div class="app">
+      <div class="topbar">
+        <div class="brand">Házi <span>Feladatok</span></div>
+      </div>
+      <h2 style="font-family:var(--serif);font-size:1.8rem;margin-bottom:1.75rem;" id="acct-heading">Fiók</h2>
+      <div class="info-card">
+        <div class="info-card-label" id="lbl-signed-in-as">Bejelentkezve</div>
+        <div class="info-val" id="acct-name"></div>
+        <div class="info-sub" id="acct-email"></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label" id="lbl-language">Nyelv</div>
+        <div class="lang-selector">
+          <button class="lang-btn" id="lang-hu" onclick="setLang('hu')">🇭🇺 Magyar</button>
+          <button class="lang-btn" id="lang-en" onclick="setLang('en')">🇬🇧 English</button>
+          <button class="lang-btn" id="lang-de" onclick="setLang('de')">🇩🇪 Deutsch</button>
+        </div>
+      </div>
+      <button class="new-ticket-btn" style="border-color:rgba(192,96,96,0.3);color:var(--red);margin-top:0;" id="btn-signout" onclick="logout()">Kijelentkezés</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ADMIN SCREEN                                           -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-admin">
+    <div class="app">
+      <div class="topbar">
+        <div class="brand">Házi <span>Feladatok</span></div>
+        <button class="admin-btn" id="btn-back-admin" onclick="navTo('tickets')">← Vissza</button>
+      </div>
+      <div class="list-header">
+        <div class="list-title" id="admin-title">Admin panel</div>
+        <div class="list-sub" id="admin-sub">Feladatok jóváhagyása és kezelése</div>
+      </div>
+      <div class="admin-section-label" id="admin-pending-label">Várakozó jóváhagyásra</div>
+      <div id="admin-pending-list"></div>
+      <div class="admin-section-label" id="admin-approved-label">Jóváhagyott</div>
+      <div id="admin-approved-list"></div>
+      <div class="admin-section-label" id="admin-rejected-label">Elutasított</div>
+      <div id="admin-rejected-list"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- BOTTOM NAV                                             -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn active" id="nav-tickets" onclick="navTo('tickets')">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label" id="nav-lbl-tickets">Feladatok</span>
+    </button>
+    <button class="nav-btn" id="nav-timetable" onclick="navTo('timetable')">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label" id="nav-lbl-timetable">Órarend</span>
+    </button>
+    <button class="nav-btn" id="nav-account" onclick="navTo('account')">
+      <span class="nav-icon">⚙</span>
+      <span class="nav-label" id="nav-lbl-account">Fiók</span>
+    </button>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- UPLOAD TICKET MODAL                                    -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="upload-modal">
+    <div class="modal modal-wide">
+      <div class="modal-title" id="upload-modal-title">Új házifeladat</div>
+      <div class="modal-sub" id="upload-modal-sub">Tölts fel egy házifeladatot. Az admin jóváhagyja, és megjelenik az órarenden.</div>
+      <div class="field">
+        <label id="lbl-subject">Tantárgy</label>
+        <select id="uf-subject">
+          <option value="">— Válassz tantárgyat —</option>
+          <option>Matematika</option>
+          <option>Magyar irodalom</option>
+          <option>Magyar nyelvtan</option>
+          <option>Történelem</option>
+          <option>Fizika</option>
+          <option>Kémia</option>
+          <option>Biológia</option>
+          <option>Földrajz</option>
+          <option>Informatika</option>
+          <option>Angol</option>
+          <option>Német</option>
+          <option>Testnevelés</option>
+          <option>Egyéb</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label id="lbl-due-date">Határidő (dátum)</label>
+          <input type="date" id="uf-date" />
+        </div>
+        <div class="field">
+          <label id="lbl-due-time">Időpont</label>
+          <input type="time" id="uf-time" value="08:00" />
+        </div>
+      </div>
+      <div class="field">
+        <label id="lbl-description">Leírás / feladat részletei</label>
+        <textarea id="uf-desc" placeholder="Pl. 56–58. oldal, 3–7. feladat"></textarea>
+      </div>
+      <div class="modal-err" id="upload-modal-err"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="btn-cancel-upload" onclick="closeUploadModal()">Mégse</button>
+        <button class="btn-accent" id="upload-save-btn" onclick="saveTicket()">Feltöltés</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- DETAIL MODAL                                           -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal modal-wide">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:1rem;">
+        <div class="modal-title" id="detail-modal-subject">—</div>
+        <button class="btn-ghost" style="flex:none;width:auto;padding:5px 12px;font-size:12px;" id="btn-close-detail" onclick="closeDetailModal()">✕</button>
+      </div>
+      <div class="detail-pill-row" id="detail-modal-pills"></div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:1.25rem;" id="detail-modal-meta"></div>
+      <div class="detail-label" id="lbl-task">Feladat</div>
+      <div class="detail-desc" id="detail-modal-desc"></div>
+      <div id="detail-modal-actions" style="margin-top:1rem;display:flex;gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- CONFIRM DELETE MODAL                                   -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal confirm-modal">
+      <div class="confirm-icon">🗑</div>
+      <div class="confirm-title" id="confirm-title">Törlés?</div>
+      <div class="confirm-sub" id="confirm-sub">Ez a feladat véglegesen törlődik. Ezt nem lehet visszavonni.</div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="btn-confirm-cancel" onclick="closeConfirmModal()">Mégse</button>
+        <button class="btn-danger" id="confirm-ok-btn" onclick="confirmDelete()">Törlés</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  'use strict';
+
+  // ─── CONFIG ──────────────────────────────────────────────
+  // Set to false and plug in real Appwrite credentials when deploying
+  const DEMO_MODE_ONLY = true;
+
+  // ─── STATE ───────────────────────────────────────────────
+  let DEMO_MODE = false;
+  let currentLang = localStorage.getItem('lang') || 'hu';
+  let currentUser = null;
+  let isAdmin = false;
+  let allTickets = [];
+  let deleteTargetId = null;
+  let currentFilter = 'all';
+
+  // ─── TRANSLATIONS ─────────────────────────────────────────
+  const STRINGS = {
+    hu: {
+      eyebrow: 'Széchenyi SZC · 9/G',
+      login_h1: 'Házi', login_em: 'Feladatok.',
+      login_sub: 'Jelentkezz be az osztályfiókkal, hogy feltöltsd és megnézd a házifeladatokat.',
+      lbl_username: 'Felhasználónév', lbl_password: 'Jelszó',
+      btn_login: 'Bejelentkezés', btn_preview: 'Előnézet fiók nélkül →',
+      preview_banner: 'Előnézeti mód — az adatok nem kerülnek mentésre',
+      btn_exit_preview: 'Kilépés',
+      nav_tickets: 'Feladatok', nav_timetable: 'Órarend', nav_account: 'Fiók',
+      tickets_title: 'Feladataim', tickets_sub: 'A te feltöltött házifeladataid',
+      filter_all: 'Mind', filter_pending: 'Várakozó', filter_approved: 'Jóváhagyott', filter_rejected: 'Elutasított',
+      tt_title: 'Órarend', tt_sub: 'Jóváhagyott feladatok dátum szerint',
+      acct_heading: 'Fiók', lbl_signed_in_as: 'Bejelentkezve', lbl_language: 'Nyelv',
+      btn_signout: 'Kijelentkezés',
+      admin_title: 'Admin panel', admin_sub: 'Feladatok jóváhagyása és kezelése',
+      admin_pending: 'Várakozó jóváhagyásra', admin_approved: 'Jóváhagyott', admin_rejected: 'Elutasított',
+      admin_btn: '⚙ Admin', btn_back_admin: '← Vissza',
+      upload_title: 'Új házifeladat',
+      upload_sub: 'Tölts fel egy házifeladatot. Az admin jóváhagyja, és megjelenik az órarenden.',
+      lbl_subject: 'Tantárgy', lbl_due_date: 'Határidő (dátum)', lbl_due_time: 'Időpont',
+      lbl_description: 'Leírás / feladat részletei',
+      btn_cancel: 'Mégse', btn_upload: 'Feltöltés',
+      lbl_task: 'Feladat', btn_close: '✕',
+      confirm_title: 'Törlés?', confirm_sub: 'Ez a feladat véglegesen törlődik. Ezt nem lehet visszavonni.',
+      btn_delete: 'Törlés',
+      pill_pending: 'Várakozó', pill_approved: 'Jóváhagyva', pill_rejected: 'Elutasítva',
+      empty_tickets: 'Még nem töltöttél fel feladatot.',
+      empty_timetable: 'Nincs jóváhagyott feladat.',
+      empty_admin: 'Nincs elem.',
+      by: 'Feltöltötte', due: 'Határidő',
+      err_fill: 'Kérlek töltsd ki az összes mezőt.',
+      toast_uploaded: 'Feladat feltöltve — várakozik jóváhagyásra.',
+      toast_approved: 'Jóváhagyva ✓', toast_rejected: 'Elutasítva.',
+      toast_deleted: 'Törölve.', toast_login_err: 'Hibás felhasználónév vagy jelszó.',
+      btn_approve: 'Jóváhagyás', btn_reject: 'Elutasítás',
+    },
+    en: {
+      eyebrow: 'Széchenyi SZC · 9/G',
+      login_h1: 'Home', login_em: 'Work.',
+      login_sub: 'Sign in with your class account to upload and view homework assignments.',
+      lbl_username: 'Username', lbl_password: 'Password',
+      btn_login: 'Sign in', btn_preview: 'Preview without account →',
+      preview_banner: 'Preview mode — no data is saved',
+      btn_exit_preview: 'Exit',
+      nav_tickets: 'Tasks', nav_timetable: 'Timetable', nav_account: 'Account',
+      tickets_title: 'My Tasks', tickets_sub: 'Homework you have submitted',
+      filter_all: 'All', filter_pending: 'Pending', filter_approved: 'Approved', filter_rejected: 'Rejected',
+      tt_title: 'Timetable', tt_sub: 'Approved homework sorted by date',
+      acct_heading: 'Account', lbl_signed_in_as: 'Signed in as', lbl_language: 'Language',
+      btn_signout: 'Sign out',
+      admin_title: 'Admin panel', admin_sub: 'Approve and manage homework tickets',
+      admin_pending: 'Pending approval', admin_approved: 'Approved', admin_rejected: 'Rejected',
+      admin_btn: '⚙ Admin', btn_back_admin: '← Back',
+      upload_title: 'New homework',
+      upload_sub: 'Submit a homework ticket. Admin will approve it and it will appear on the timetable.',
+      lbl_subject: 'Subject', lbl_due_date: 'Due date', lbl_due_time: 'Time',
+      lbl_description: 'Description / task details',
+      btn_cancel: 'Cancel', btn_upload: 'Submit',
+      lbl_task: 'Task', btn_close: '✕',
+      confirm_title: 'Delete?', confirm_sub: 'This homework will be permanently deleted. This cannot be undone.',
+      btn_delete: 'Delete',
+      pill_pending: 'Pending', pill_approved: 'Approved', pill_rejected: 'Rejected',
+      empty_tickets: 'You have not submitted any homework yet.',
+      empty_timetable: 'No approved homework found.',
+      empty_admin: 'Nothing here.',
+      by: 'Submitted by', due: 'Due',
+      err_fill: 'Please fill in all required fields.',
+      toast_uploaded: 'Homework submitted — pending approval.',
+      toast_approved: 'Approved ✓', toast_rejected: 'Rejected.',
+      toast_deleted: 'Deleted.', toast_login_err: 'Wrong username or password.',
+      btn_approve: 'Approve', btn_reject: 'Reject',
+    },
+    de: {
+      eyebrow: 'Széchenyi SZC · 9/G',
+      login_h1: 'Haus', login_em: 'aufgaben.',
+      login_sub: 'Melde dich mit dem Klassenkonto an, um Hausaufgaben hochzuladen und anzusehen.',
+      lbl_username: 'Benutzername', lbl_password: 'Passwort',
+      btn_login: 'Anmelden', btn_preview: 'Vorschau ohne Konto →',
+      preview_banner: 'Vorschaumodus — Daten werden nicht gespeichert',
+      btn_exit_preview: 'Beenden',
+      nav_tickets: 'Aufgaben', nav_timetable: 'Stundenplan', nav_account: 'Konto',
+      tickets_title: 'Meine Aufgaben', tickets_sub: 'Von dir eingereichte Hausaufgaben',
+      filter_all: 'Alle', filter_pending: 'Ausstehend', filter_approved: 'Genehmigt', filter_rejected: 'Abgelehnt',
+      tt_title: 'Stundenplan', tt_sub: 'Genehmigte Hausaufgaben nach Datum sortiert',
+      acct_heading: 'Konto', lbl_signed_in_as: 'Angemeldet als', lbl_language: 'Sprache',
+      btn_signout: 'Abmelden',
+      admin_title: 'Admin-Panel', admin_sub: 'Hausaufgaben genehmigen und verwalten',
+      admin_pending: 'Ausstehende Genehmigung', admin_approved: 'Genehmigt', admin_rejected: 'Abgelehnt',
+      admin_btn: '⚙ Admin', btn_back_admin: '← Zurück',
+      upload_title: 'Neue Hausaufgabe',
+      upload_sub: 'Reiche eine Hausaufgabe ein. Der Admin genehmigt sie und sie erscheint im Stundenplan.',
+      lbl_subject: 'Fach', lbl_due_date: 'Fälligkeitsdatum', lbl_due_time: 'Uhrzeit',
+      lbl_description: 'Beschreibung / Aufgabendetails',
+      btn_cancel: 'Abbrechen', btn_upload: 'Einreichen',
+      lbl_task: 'Aufgabe', btn_close: '✕',
+      confirm_title: 'Löschen?', confirm_sub: 'Diese Aufgabe wird dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.',
+      btn_delete: 'Löschen',
+      pill_pending: 'Ausstehend', pill_approved: 'Genehmigt', pill_rejected: 'Abgelehnt',
+      empty_tickets: 'Du hast noch keine Hausaufgabe eingereicht.',
+      empty_timetable: 'Keine genehmigten Hausaufgaben.',
+      empty_admin: 'Nichts vorhanden.',
+      by: 'Eingereicht von', due: 'Fällig',
+      err_fill: 'Bitte alle Pflichtfelder ausfüllen.',
+      toast_uploaded: 'Hausaufgabe eingereicht — wartet auf Genehmigung.',
+      toast_approved: 'Genehmigt ✓', toast_rejected: 'Abgelehnt.',
+      toast_deleted: 'Gelöscht.', toast_login_err: 'Falscher Benutzername oder Passwort.',
+      btn_approve: 'Genehmigen', btn_reject: 'Ablehnen',
+    },
+  };
+  function t(k) { return (STRINGS[currentLang] || STRINGS.hu)[k] || k; }
+
+  // ─── DEMO DATA ────────────────────────────────────────────
+  function daysFromNow(n) {
+    const d = new Date();
+    d.setDate(d.getDate() + n);
+    return d.toISOString().split('T')[0];
+  }
+
+  const DEMO_TICKETS = [
+    { id: 'demo-1', subject: 'Matematika',      dueDate: daysFromNow(2), dueTime: '08:00', desc: '56–58. oldal, 3–7. feladat (egyenletek megoldása). Minden lépést írj le!', status: 'approved', submittedBy: 'Kovács Balázs', submittedAt: new Date(Date.now() - 86400000 * 2).toISOString() },
+    { id: 'demo-2', subject: 'Történelem',      dueDate: daysFromNow(1), dueTime: '10:00', desc: 'Olvasd el a 4. fejezetet (A dualizmus kora) és készíts vázlatot. Legalább 10 pont legyen benne.', status: 'approved', submittedBy: 'Nagy Anna', submittedAt: new Date(Date.now() - 86400000 * 3).toISOString() },
+    { id: 'demo-3', subject: 'Angol',           dueDate: daysFromNow(3), dueTime: '08:00', desc: 'Workbook p. 34–35, exercises A–C. Write a short email (80 words) about your weekend plans.', status: 'approved', submittedBy: 'Tóth Péter',  submittedAt: new Date(Date.now() - 86400000).toISOString() },
+    { id: 'demo-4', subject: 'Fizika',          dueDate: daysFromNow(4), dueTime: '08:00', desc: 'Newton törvényei — 3 feladat a munkafüzetből (12–14. oldal). Rajzolj is erőábrát!', status: 'pending',  submittedBy: 'Demo Felhasználó', submittedAt: new Date().toISOString() },
+    { id: 'demo-5', subject: 'Magyar irodalom', dueDate: daysFromNow(5), dueTime: '08:00', desc: 'Petőfi: Szeptember végén — elemzés (min. 200 szó). Téma: természet és szerelemfélelem.', status: 'pending',  submittedBy: 'Szabó Lili',  submittedAt: new Date(Date.now() - 3600000).toISOString() },
+    { id: 'demo-6', subject: 'Kémia',           dueDate: daysFromNow(-1), dueTime: '08:00', desc: 'Periódusos rendszer elemei: alkálifémek és halogének összehasonlítása. (Táblázat formában)', status: 'rejected', submittedBy: 'Demo Felhasználó', submittedAt: new Date(Date.now() - 86400000 * 4).toISOString() },
+    { id: 'demo-7', subject: 'Biológia',        dueDate: daysFromNow(2), dueTime: '08:00', desc: 'Sejtciklus fázisai — rajz és magyarázat. Az ábra legyen legalább A5 méretű és legyen feliratozva.', status: 'approved', submittedBy: 'Kiss Márton', submittedAt: new Date(Date.now() - 86400000 * 2).toISOString() },
+    { id: 'demo-8', subject: 'Informatika',     dueDate: daysFromNow(6), dueTime: '12:00', desc: 'Python feladat: írj programot, amely bekér 10 számot és megadja az átlagukat, minimumukat és maximumukat.', status: 'pending',  submittedBy: 'Demo Felhasználó', submittedAt: new Date().toISOString() },
+  ];
+
+  // ─── SCREEN MANAGEMENT ───────────────────────────────────
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  function showLoading() { document.getElementById('loading').classList.remove('hidden'); }
+  function hideLoading() { document.getElementById('loading').classList.add('hidden'); }
+
+  function showBottomNav() { document.getElementById('bottom-nav').classList.add('visible'); }
+  function hideBottomNav() { document.getElementById('bottom-nav').classList.remove('visible'); }
+
+  function navTo(dest) {
+    const map = { tickets: 'screen-tickets', timetable: 'screen-timetable', account: 'screen-account', admin: 'screen-admin' };
+    if (map[dest]) showScreen(map[dest]);
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const nb = document.getElementById('nav-' + dest);
+    if (nb) nb.classList.add('active');
+
+    if (dest === 'tickets')  renderTickets();
+    if (dest === 'timetable') renderTimetable();
+    if (dest === 'admin')    renderAdmin();
+
+    // FAB only on tickets
+    const fab = document.getElementById('fab');
+    fab.style.display = (dest === 'tickets') ? 'flex' : 'none';
+  }
+
+  // ─── TOAST ───────────────────────────────────────────────
+  let _toastT;
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(_toastT);
+    _toastT = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  // ─── AUTH ────────────────────────────────────────────────
+  async function login() {
+    const user  = document.getElementById('login-username').value.trim();
+    const pw    = document.getElementById('login-pw').value;
+    const errEl = document.getElementById('login-err');
+    const btn   = document.getElementById('login-btn');
+    errEl.textContent = '';
+    if (!user || !pw) { errEl.textContent = t('err_fill'); return; }
+    btn.disabled = true;
+
+    // Simulate network delay in demo mode
+    await new Promise(r => setTimeout(r, 600));
+
+    if (DEMO_MODE_ONLY) {
+      isAdmin = ['admin', 'admin@demo.hu', 'administrator'].includes(user.toLowerCase());
+      currentUser = { name: user, email: user + '@iskola.hu', id: 'user-' + Date.now() };
+      // Give non-admin users only their own tickets from demo set
+      allTickets = JSON.parse(JSON.stringify(DEMO_TICKETS));
+      btn.disabled = false;
+      afterLogin();
+      return;
+    }
+
+    // ← Plug in Appwrite/backend auth here
+    errEl.textContent = t('toast_login_err');
+    btn.disabled = false;
+  }
+
+  function afterLogin() {
+    setText('user-badge', currentUser.name);
+    setText('tt-user-badge', currentUser.name);
+    setText('acct-name', currentUser.name);
+    setText('acct-email', currentUser.email);
+    if (isAdmin) document.getElementById('admin-panel-btn').style.display = '';
+    else          document.getElementById('admin-panel-btn').style.display = 'none';
+    showBottomNav();
+    applyLang();
+    navTo('tickets');
+  }
+
+  function enterPreview() {
+    DEMO_MODE = true;
+    isAdmin = true; // preview shows everything
+    currentUser = { name: 'Demo Felhasználó', email: 'demo@iskola.hu', id: 'preview' };
+    allTickets = JSON.parse(JSON.stringify(DEMO_TICKETS));
+    const pb = document.getElementById('preview-banner');
+    pb.style.display = '';
+    pb.innerHTML = t('preview_banner') + ' <span>·</span> <button class="exit-preview-btn" onclick="exitPreview()">' + t('btn_exit_preview') + '</button>';
+    afterLogin();
+  }
+
+  function exitPreview() {
+    DEMO_MODE = false; isAdmin = false; currentUser = null; allTickets = [];
+    document.getElementById('preview-banner').style.display = 'none';
+    hideBottomNav();
+    document.getElementById('fab').style.display = 'none';
+    document.getElementById('admin-panel-btn').style.display = 'none';
+    showScreen('screen-login');
+    applyLang();
+  }
+
+  function logout() { exitPreview(); }
+
+  // ─── FILTER ───────────────────────────────────────────────
+  function setFilter(f) {
+    currentFilter = f;
+    document.querySelectorAll('#tickets-filter-bar .filter-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.filter === f);
+    });
+    renderTickets();
+  }
+
+  // ─── TICKETS RENDER ──────────────────────────────────────
+  function getMyTickets() {
+    if (DEMO_MODE || isAdmin) return allTickets;
+    return allTickets.filter(tk => tk.submittedBy === currentUser.name);
+  }
+
+  function renderTickets() {
+    const list = document.getElementById('tickets-list');
+    let my = getMyTickets();
+    if (currentFilter !== 'all') my = my.filter(tk => tk.status === currentFilter);
+
+    if (my.length === 0) {
+      list.innerHTML = `<div class="empty-state">${t('empty_tickets')}</div>`;
+      return;
+    }
+    list.innerHTML = my.map(tk => `
+      <div class="ticket-card ${(DEMO_MODE || isAdmin || tk.submittedBy === currentUser?.name) ? 'mine' : ''}" onclick="openDetailModal('${tk.id}')">
+        <div class="tc-left">
+          <div class="tc-subject">${esc(tk.subject)}</div>
+          <div class="tc-meta">${t('due')}: ${formatDate(tk.dueDate)} · ${esc(tk.submittedBy)}</div>
+        </div>
+        <div class="tc-right">
+          <div class="pill ${tk.status}"><span class="pill-dot"></span>${t('pill_' + tk.status)}</div>
+          <span style="color:var(--muted);font-size:18px;">›</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ─── TIMETABLE ───────────────────────────────────────────
+  const SUBJ_COLORS = ['#c8b89a','#4caf7d','#6b9fd4','#d4935a','#c06060','#9b6dbd','#4ab0c1','#c1b04a'];
+  let subjColorMap = {};
+  let colorIdx = 0;
+  function subjectColor(subj) {
+    if (!subjColorMap[subj]) { subjColorMap[subj] = SUBJ_COLORS[colorIdx++ % SUBJ_COLORS.length]; }
+    return subjColorMap[subj];
+  }
+
+  function renderTimetable() {
+    subjColorMap = {}; colorIdx = 0;
+    const content = document.getElementById('timetable-content');
+    const approved = allTickets.filter(tk => tk.status === 'approved');
+    if (approved.length === 0) { content.innerHTML = `<div class="empty-state">${t('empty_timetable')}</div>`; return; }
+
+    const groups = {};
+    approved.forEach(tk => { if (!groups[tk.dueDate]) groups[tk.dueDate] = []; groups[tk.dueDate].push(tk); });
+
+    content.innerHTML = Object.keys(groups).sort().map(date => `
+      <div class="day-group">
+        <div class="day-label">${formatDateFull(date)}</div>
+        ${groups[date].map(tk => `
+          <div class="hw-card" onclick="openDetailModal('${tk.id}')">
+            <div class="hw-subj-dot" style="background:${subjectColor(tk.subject)};"></div>
+            <div class="hw-info">
+              <div class="hw-subject">${esc(tk.subject)}</div>
+              <div class="hw-desc">${esc(tk.desc)}</div>
+              <div class="hw-by">${t('by')}: ${esc(tk.submittedBy)}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  }
+
+  // ─── ADMIN ───────────────────────────────────────────────
+  function renderAdmin() {
+    const groups = { pending: [], approved: [], rejected: [] };
+    allTickets.forEach(tk => { if (groups[tk.status]) groups[tk.status].push(tk); });
+
+    document.getElementById('admin-pending-list').innerHTML  = renderAdminGroup(groups.pending, true);
+    document.getElementById('admin-approved-list').innerHTML = renderAdminGroup(groups.approved, false);
+    document.getElementById('admin-rejected-list').innerHTML = renderAdminGroup(groups.rejected, false);
+  }
+
+  function renderAdminGroup(tickets, showActions) {
+    if (!tickets.length) return `<div class="empty-state" style="padding:1rem 0;">${t('empty_admin')}</div>`;
+    return tickets.map(tk => `
+      <div class="admin-ticket-card">
+        <div class="atc-left">
+          <div class="atc-subject">${esc(tk.subject)}</div>
+          <div class="atc-meta">${t('due')}: ${formatDate(tk.dueDate)} ${tk.dueTime} · ${esc(tk.submittedBy)}</div>
+          <div class="atc-desc">${esc(tk.desc)}</div>
+        </div>
+        <div class="atc-right">
+          <div class="pill ${tk.status}" style="margin-bottom:6px;"><span class="pill-dot"></span>${t('pill_' + tk.status)}</div>
+          <div class="atc-actions">
+            ${showActions ? `
+              <button class="icon-btn approve" title="${t('btn_approve')}" onclick="adminAction('approve','${tk.id}')">✓</button>
+              <button class="icon-btn reject-btn" title="${t('btn_reject')}" onclick="adminAction('reject','${tk.id}')">✕</button>
+            ` : ''}
+            <button class="icon-btn danger" title="${t('btn_delete')}" onclick="openConfirmModal('${tk.id}')">🗑</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function adminAction(action, id) {
+    const tk = allTickets.find(x => x.id === id);
+    if (!tk) return;
+    tk.status = action === 'approve' ? 'approved' : 'rejected';
+    toast(action === 'approve' ? t('toast_approved') : t('toast_rejected'));
+    renderAdmin();
+    // update timetable/tickets if visible
+    if (document.getElementById('screen-tickets').classList.contains('active')) renderTickets();
+    if (document.getElementById('screen-timetable').classList.contains('active')) renderTimetable();
+  }
+
+  // ─── DETAIL MODAL ─────────────────────────────────────────
+  function openDetailModal(id) {
+    const tk = allTickets.find(x => x.id === id);
+    if (!tk) return;
+
+    setText('detail-modal-subject', tk.subject);
+    document.getElementById('detail-modal-meta').textContent = `${t('due')}: ${formatDate(tk.dueDate)} ${tk.dueTime}  ·  ${t('by')}: ${tk.submittedBy}`;
+    setText('detail-modal-desc', tk.desc);
+
+    document.getElementById('detail-modal-pills').innerHTML =
+      `<div class="pill ${tk.status}"><span class="pill-dot"></span>${t('pill_' + tk.status)}</div>`;
+
+    const acts = document.getElementById('detail-modal-actions');
+    if (isAdmin && tk.status === 'pending') {
+      acts.innerHTML = `
+        <button class="btn-green" onclick="adminAction('approve','${tk.id}');closeDetailModal();">${t('btn_approve')}</button>
+        <button class="btn-danger" onclick="adminAction('reject','${tk.id}');closeDetailModal();">${t('btn_reject')}</button>
+      `;
+    } else {
+      acts.innerHTML = '';
+    }
+
+    document.getElementById('detail-modal').classList.add('open');
+  }
+  function closeDetailModal() { document.getElementById('detail-modal').classList.remove('open'); }
+
+  // ─── UPLOAD MODAL ─────────────────────────────────────────
+  function openUploadModal() {
+    document.getElementById('uf-subject').value = '';
+    document.getElementById('uf-date').value = '';
+    document.getElementById('uf-time').value = '08:00';
+    document.getElementById('uf-desc').value = '';
+    document.getElementById('upload-modal-err').textContent = '';
+    document.getElementById('upload-modal').classList.add('open');
+  }
+  function closeUploadModal() { document.getElementById('upload-modal').classList.remove('open'); }
+
+  function saveTicket() {
+    const subject = document.getElementById('uf-subject').value;
+    const date    = document.getElementById('uf-date').value;
+    const time    = document.getElementById('uf-time').value;
+    const desc    = document.getElementById('uf-desc').value.trim();
+    const errEl   = document.getElementById('upload-modal-err');
+
+    if (!subject || !date || !desc) { errEl.textContent = t('err_fill'); return; }
+
+    allTickets.unshift({
+      id: 'tk-' + Date.now(),
+      subject, dueDate: date, dueTime: time, desc,
+      status: 'pending',
+      submittedBy: currentUser.name,
+      submittedAt: new Date().toISOString(),
+    });
+    closeUploadModal();
+    renderTickets();
+    toast(t('toast_uploaded'));
+  }
+
+  // ─── CONFIRM DELETE ────────────────────────────────────────
+  function openConfirmModal(id) { deleteTargetId = id; document.getElementById('confirm-modal').classList.add('open'); }
+  function closeConfirmModal()  { deleteTargetId = null; document.getElementById('confirm-modal').classList.remove('open'); }
+  function confirmDelete() {
+    if (!deleteTargetId) return;
+    allTickets = allTickets.filter(tk => tk.id !== deleteTargetId);
+    closeConfirmModal();
+    toast(t('toast_deleted'));
+    renderAdmin();
+    if (document.getElementById('screen-tickets').classList.contains('active')) renderTickets();
+  }
+
+  // ─── DATE HELPERS ─────────────────────────────────────────
+  const MONTHS = {
+    hu: ['jan.','feb.','már.','ápr.','máj.','jún.','júl.','aug.','szep.','okt.','nov.','dec.'],
+    en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    de: ['Jan.','Feb.','März','Apr.','Mai','Juni','Juli','Aug.','Sep.','Okt.','Nov.','Dez.'],
+  };
+  const DAYS = {
+    hu: ['vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat'],
+    en: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+    de: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+  };
+  function formatDate(s) {
+    if (!s) return '—';
+    const [y, m, d] = s.split('-').map(Number);
+    const M = (MONTHS[currentLang] || MONTHS.hu)[m - 1];
+    return `${y}. ${M} ${d}.`;
+  }
+  function formatDateFull(s) {
+    if (!s) return '—';
+    const [y, m, d] = s.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    const M = (MONTHS[currentLang] || MONTHS.hu)[m - 1];
+    const day = (DAYS[currentLang] || DAYS.hu)[date.getDay()];
+    return `${M} ${d}. — ${day}`;
+  }
+
+  // ─── HELPERS ──────────────────────────────────────────────
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+  // ─── LANGUAGE ─────────────────────────────────────────────
+  function setLang(lang) { currentLang = lang; localStorage.setItem('lang', lang); applyLang(); }
+
+  function applyLang() {
+    // lang buttons
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    const lb = document.getElementById('lang-' + currentLang);
+    if (lb) lb.classList.add('active');
+
+    // Login
+    setText('lbl-eyebrow', t('eyebrow'));
+    const ltel = document.getElementById('login-title-el');
+    if (ltel) ltel.innerHTML = t('login_h1') + '<br><em>' + t('login_em') + '</em>';
+    setText('lbl-sub', t('login_sub'));
+    setText('lbl-username', t('lbl_username'));
+    setText('lbl-password', t('lbl_password'));
+    setText('login-btn', t('btn_login'));
+    setText('preview-btn-txt', t('btn_preview'));
+
+    // Preview banner
+    const pb = document.getElementById('preview-banner');
+    if (pb && pb.style.display !== 'none') {
+      pb.innerHTML = t('preview_banner') + ' <span>·</span> <button class="exit-preview-btn" onclick="exitPreview()">' + t('btn_exit_preview') + '</button>';
+    }
+
+    // Nav
+    setText('nav-lbl-tickets', t('nav_tickets'));
+    setText('nav-lbl-timetable', t('nav_timetable'));
+    setText('nav-lbl-account', t('nav_account'));
+
+    // Tickets
+    setText('tickets-title', t('tickets_title'));
+    setText('tickets-sub', t('tickets_sub'));
+    // Filter chips
+    const chips = document.querySelectorAll('#tickets-filter-bar .filter-chip');
+    const fkeys = ['all','pending','approved','rejected'];
+    chips.forEach((c,i) => { if (fkeys[i]) c.textContent = t('filter_' + fkeys[i]); });
+
+    // Timetable
+    setText('tt-title', t('tt_title'));
+    setText('tt-sub', t('tt_sub'));
+
+    // Account
+    setText('acct-heading', t('acct_heading'));
+    setText('lbl-signed-in-as', t('lbl_signed_in_as'));
+    setText('lbl-language', t('lbl_language'));
+    setText('btn-signout', t('btn_signout'));
+
+    // Admin
+    setText('admin-title', t('admin_title'));
+    setText('admin-sub', t('admin_sub'));
+    setText('admin-pending-label', t('admin_pending'));
+    setText('admin-approved-label', t('admin_approved'));
+    setText('admin-rejected-label', t('admin_rejected'));
+    setText('admin-panel-btn', t('admin_btn'));
+    setText('btn-back-admin', t('btn_back_admin'));
+
+    // Upload modal
+    setText('upload-modal-title', t('upload_title'));
+    setText('upload-modal-sub', t('upload_sub'));
+    setText('lbl-subject', t('lbl_subject'));
+    setText('lbl-due-date', t('lbl_due_date'));
+    setText('lbl-due-time', t('lbl_due_time'));
+    setText('lbl-description', t('lbl_description'));
+    setText('btn-cancel-upload', t('btn_cancel'));
+    setText('upload-save-btn', t('btn_upload'));
+
+    // Detail modal
+    setText('lbl-task', t('lbl_task'));
+    setText('btn-close-detail', t('btn_close'));
+
+    // Confirm modal
+    setText('confirm-title', t('confirm_title'));
+    setText('confirm-sub', t('confirm_sub'));
+    setText('confirm-ok-btn', t('btn_delete'));
+
+    // Re-render dynamic screens
+    if (document.getElementById('screen-tickets').classList.contains('active'))   renderTickets();
+    if (document.getElementById('screen-timetable').classList.contains('active')) renderTimetable();
+    if (document.getElementById('screen-admin').classList.contains('active'))      renderAdmin();
+  }
+
+  // ─── BOOT ────────────────────────────────────────────────
+  (async () => {
+    showLoading();
+    await new Promise(r => setTimeout(r, 350));
+    applyLang();
+    hideLoading();
+    showScreen('screen-login');
+  })();
+  </script>
+
+<!-- All rights reserved. - Made by QuaternionDev (https://github.com/QuaternionDev) - 2026
+# v1.0.0 -->
+</body>
+</html>
