@@ -48,6 +48,7 @@
 
     /* ─── LAYOUT ─────────────────────────────────────────── */
     .app { max-width: 520px; margin: 0 auto; padding: 0 1.25rem 5rem; }
+    .preview-active .topbar { margin-top: 36px; }
 
     /* ─── SCREENS ────────────────────────────────────────── */
     .screen { display: none; animation: fadein 0.3s ease; }
@@ -855,6 +856,7 @@
     currentUser = { name: 'Demo Felhasználó', email: 'demo@iskola.hu', id: 'preview' };
     allTickets = JSON.parse(JSON.stringify(DEMO_TICKETS));
     const pb = document.getElementById('preview-banner');
+    document.body.classList.add('preview-active');
     pb.style.display = '';
     pb.innerHTML = t('preview_banner') + ' <span>·</span> <button class="exit-preview-btn" onclick="exitPreview()">' + t('btn_exit_preview') + '</button>';
     afterLogin();
@@ -866,6 +868,7 @@
     hideBottomNav();
     document.getElementById('fab').style.display = 'none';
     document.getElementById('admin-panel-btn').style.display = 'none';
+    document.body.classList.remove('preview-active');
     showScreen('screen-login');
     applyLang();
   }
