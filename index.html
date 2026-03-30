@@ -402,7 +402,7 @@
   <div class="preview-banner" id="preview-banner" style="display:none;"></div>
 
   <!-- LOADING -->
-  <div class="loading-overlay" id="loading"><div class="spinner"></div></div>
+  <div class="loading-overlay hidden" id="loading"><div class="spinner"></div></div>
 
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
@@ -413,7 +413,7 @@
   <!-- ══════════════════════════════════════════════════════ -->
   <!-- LOGIN SCREEN                                           -->
   <!-- ══════════════════════════════════════════════════════ -->
-  <div class="screen active" id="screen-login">
+  <div class="screen" id="screen-login">
     <div class="login-wrap">
       <div class="login-eyebrow" id="lbl-eyebrow">Széchenyi SZC · 9/G</div>
       <h1 class="login-title" id="login-title-el">Házi<br><em>Feladatok.</em></h1>
@@ -778,8 +778,8 @@
     if (el) el.classList.add('active');
     window.scrollTo(0, 0);
   }
-  function showLoading() { document.getElementById('loading').classList.remove('hidden'); }
-  function hideLoading() { document.getElementById('loading').classList.add('hidden'); }
+  function showLoading() { /* no-op in preview-only branch */ }
+  function hideLoading() { /* no-op in preview-only branch */ }
 
   function showBottomNav() { document.getElementById('bottom-nav').classList.add('visible'); }
   function hideBottomNav() { document.getElementById('bottom-nav').classList.remove('visible'); }
@@ -855,25 +855,15 @@
     isAdmin = true; // preview shows everything
     currentUser = { name: 'Demo Felhasználó', email: 'demo@iskola.hu', id: 'preview' };
     allTickets = JSON.parse(JSON.stringify(DEMO_TICKETS));
-    const pb = document.getElementById('preview-banner');
     document.body.classList.add('preview-active');
-    pb.style.display = '';
-    pb.innerHTML = t('preview_banner') + ' <span>·</span> <button class="exit-preview-btn" onclick="exitPreview()">' + t('btn_exit_preview') + '</button>';
     afterLogin();
   }
 
   function exitPreview() {
-    DEMO_MODE = false; isAdmin = false; currentUser = null; allTickets = [];
-    document.getElementById('preview-banner').style.display = 'none';
-    hideBottomNav();
-    document.getElementById('fab').style.display = 'none';
-    document.getElementById('admin-panel-btn').style.display = 'none';
-    document.body.classList.remove('preview-active');
-    showScreen('screen-login');
-    applyLang();
+    // No-op in preview-only branch
   }
 
-  function logout() { exitPreview(); }
+  function logout() { /* no-op in preview-only branch */ }
 
   // ─── FILTER ───────────────────────────────────────────────
   function setFilter(f) {
@@ -1175,13 +1165,11 @@
   }
 
   // ─── BOOT ────────────────────────────────────────────────
-  (async () => {
-    showLoading();
-    await new Promise(r => setTimeout(r, 350));
+  // Preview-only branch: skip login, go straight into the app
+  document.addEventListener('DOMContentLoaded', () => {
     applyLang();
-    hideLoading();
-    showScreen('screen-login');
-  })();
+    enterPreview();
+  });
   </script>
 
 <!-- All rights reserved. - Made by m1lkacsokker (https://github.com/m1lkacsokker) - 2026
